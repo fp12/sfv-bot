@@ -1,6 +1,6 @@
 import os
 
-app_config = []
+app_config = {}
 
 if os.getenv('heroku') is not None:
     for k in ['discord_token']:
