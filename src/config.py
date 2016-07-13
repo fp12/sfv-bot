@@ -3,7 +3,7 @@ import os
 app_config = {}
 
 if os.getenv('heroku') is not None:
-    for k in ['discord_token']:
+    for k in ['discord_token', 'twitter_consumer_key', 'twitter_consumer_secret', 'twitter_access_token_key', 'twitter_access_token_secret']:
         app_config[k] = os.getenv(k)
 else:
     import json
