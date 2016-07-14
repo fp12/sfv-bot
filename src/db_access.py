@@ -17,25 +17,19 @@ class DBAccess():
 
         # with open('../config/createtables.sql') as data_file:
         try:
-            self._c.execute('CREATE TABLE IF NOT EXISTS persistence ("key" TEXT, "value" TEXT)')            
+            self._c.execute('INSERT INTO persistence (key, value) VALUES (%s, %S);', ('last_tweet', '753076611352756228'))
             self._conn.commit()
         except Exception as e:
             self._log_exc('__init__', e)
 
         try:
-            self._c.execute('INSERT INTO persistence (key, value) VALUES (?, ?)', ('last_tweet', '753076611352756228'))
+            self._c.execute('CREATE TABLE IF NOT EXISTS update_channels ("server_id" varchar, "channel_id" varchar);')
             self._conn.commit()
         except Exception as e:
             self._log_exc('__init__', e)
 
         try:
-            self._c.execute('CREATE TABLE IF NOT EXISTS update_channels ("server_id" TEXT, "channel_id" TEXT)')
-            self._conn.commit()
-        except Exception as e:
-            self._log_exc('__init__', e)
-
-        try:
-            self._c.execute('INSERT INTO update_channels (server_id, channel_id) VALUES (?, ?)', ('154261963692703745', '169500338494111744'))
+            self._c.execute('INSERT INTO update_channels (server_id, channel_id) VALUES (%s, %s);', ('154261963692703745', '169500338494111744'))
             self._conn.commit()
         except Exception as e:
             self._log_exc('__init__', e)
@@ -51,13 +45,13 @@ class DBAccess():
 
     def set_last_tweet(self, tweet_id):
         try:
-            self._c.execute('UPDATE persistence SET value=? WHERE key=?', (tweet_id, 'last_tweet'))
+            self._c.execute('UPDATE persistence SET value=%s WHERE key=%s;', (tweet_id, 'last_tweet'))
             self._conn.commit()
         except Exception as e:
             self._log_exc('set_last_tweet', e)
 
     def get_last_tweet(self):
-        self._c.execute('SELECT * FROM persistence WHERE key=?', ('last_tweet',))
+        self._c.execute('SELECT * FROM persistence WHERE key=%s;', ('last_tweet',))
         return DBPersistence(self._c.fetchone())
 
     def get_update_channels(self):
