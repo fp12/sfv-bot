@@ -1,10 +1,10 @@
 import asyncio
+import re
 from enum import Enum
 import twitter
 import discord
 from config import app_config
-import re
-
+from db_access import db
 
 class ServerAvailability(Enum):
     Unknown = -1
@@ -22,6 +22,11 @@ r_up = re.compile(r""".*servers.+are\s(.*\s)?(open|up)[,!\.\s].*""", re.IGNORECA
 r_down = re.compile(r""".*servers.+are\s(.*\s)?(down|offline)[,!\.\s].*""", re.IGNORECASE)
 
 
+update_template = """```ruby
+Update From SFVServer (Twitter):
+# %s
+```"""
+
 def get_server_availability(text):
     if r_up.match(text):
         return ServerAvailability.Up
@@ -31,8 +36,8 @@ def get_server_availability(text):
         return ServerAvailability.Unknown
 
 
-async def _do_refresh(client):
-    server_status = api.GetHomeTimeline(exclude_replies=True, count=1)[0]
+async def _process_new_status(client, server_status):
+    db.set_last_tweet(server_status.id)
     server_availability = get_server_availability(server_status.text)
     for s in client.servers:
         bot_status = s.me.status
@@ -54,6 +59,17 @@ async def _do_refresh(client):
     if old_game_name != new_game_name or old_idle != new_idle:
         print('updated game name from [%s] to [%s] and idle from [%s] to [%s]' % (old_game_name, new_game_name, old_idle, new_idle))
         await client.change_status(game=discord.Game(name=new_game_name), idle=new_idle)
+
+    # send message to all registered channels
+    for c in db.get_update_channels():
+        await client.send_message(discord.Channel(id=c.channel_id), update_template % server_status.text)
+
+
+async def _do_refresh(client):
+    last_id = db.get_last_tweet().value
+    server_statuses = api.GetHomeTimeline(exclude_replies=True, since_id=last_id)
+    for s in server_statuses:
+        await _process_new_status(client, s)
 
 
 async def refresh_twitter_updates(client, interval):
