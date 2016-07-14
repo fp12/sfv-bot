@@ -17,10 +17,25 @@ class DBAccess():
 
         # with open('../config/createtables.sql') as data_file:
         try:
-            self._c.execute('CREATE TABLE IF NOT EXISTS persistence (key TEXT, value TEXT)')
-            self._c.execute('INSERT INTO persistence (key, value) VALUES ("last_tweet", "753076611352756228")')
-            self._c.execute('CREATE TABLE IF NOT EXISTS update_channels (server_id TEXT, channel_id TEXT)')
-            self._c.execute('INSERT INTO update_channels (server_id, channel_id) VALUES ("154261963692703745", "169500338494111744")')
+            self._c.execute('CREATE TABLE IF NOT EXISTS persistence ("key" TEXT, "value" TEXT)')            
+            self._conn.commit()
+        except Exception as e:
+            self._log_exc('__init__', e)
+
+        try:
+            self._c.execute('INSERT INTO persistence (key, value) VALUES (?, ?)', ('last_tweet', '753076611352756228'))
+            self._conn.commit()
+        except Exception as e:
+            self._log_exc('__init__', e)
+
+        try:
+            self._c.execute('CREATE TABLE IF NOT EXISTS update_channels ("server_id" TEXT, "channel_id" TEXT)')
+            self._conn.commit()
+        except Exception as e:
+            self._log_exc('__init__', e)
+
+        try:
+            self._c.execute('INSERT INTO update_channels (server_id, channel_id) VALUES (?, ?)', ('154261963692703745', '169500338494111744'))
             self._conn.commit()
         except Exception as e:
             self._log_exc('__init__', e)
