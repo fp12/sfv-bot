@@ -17,7 +17,7 @@ class DBAccess():
 
         # with open('../config/createtables.sql') as data_file:
         try:
-            self._c.execute('INSERT INTO persistence (key, value) VALUES (%s, %S);', ('last_tweet', '753076611352756228'))
+            self._c.execute('INSERT INTO persistence (key, value) VALUES (%s, %s);', ('last_tweet', '753076611352756228'))
             self._conn.commit()
         except Exception as e:
             self._log_exc('__init__', e)
