@@ -15,12 +15,22 @@ class DBAccess():
 
         self._c = self._conn.cursor()
 
-        with open('../config/createtables.sql') as data_file:
-            try:
-                self._c.executescript(data_file.read())
-                self._conn.commit()
-            except Exception as e:
-                self._log_exc('__init__', e)
+        # with open('../config/createtables.sql') as data_file:
+        try:
+            self._c.executescript("""CREATE TABLE IF NOT EXISTS `persistence` (
+`key`   TEXT,
+`value` TEXT
+);
+INSERT INTO `persistence`(`key`, `value`) VALUES ("last_tweet", "753076611352756228");
+
+CREATE TABLE IF NOT EXISTS `update_channels` (
+`server_id` TEXT,
+`channel_id` TEXT
+);
+INSERT INTO `update_channels` (`server_id`, `channel_id`) VALUES ("154261963692703745", "169500338494111744");""")
+            self._conn.commit()
+        except Exception as e:
+            self._log_exc('__init__', e)
 
     def __del__(self):
         self._c.close()
