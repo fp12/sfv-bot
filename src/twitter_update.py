@@ -6,6 +6,7 @@ import twitter
 import discord
 from config import app_config
 from db_access import db
+import logging
 import log
 
 class ServerAvailability(Enum):

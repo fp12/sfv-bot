@@ -1,5 +1,6 @@
 from config import app_config
 from db_models import DBPersistence, DBUpdateChannel
+import logging
 import log
 
 
