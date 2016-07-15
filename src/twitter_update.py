@@ -45,21 +45,20 @@ async def _process_new_status(client, server_status):
         bot_status = s.me.status
         old_game_name = s.me.game.name if s.me.game else ''
         break
-    old_idle = bot_status == discord.Status.idle
+
+    new_idle = old_idle = bot_status == discord.Status.idle
     if old_idle:
         if server_availability == ServerAvailability.Up:
             new_idle = False
             new_game_name = 'servers UP'
         else:
             new_game_name = 'servers DOWN'
-            new_idle = True
     else:
         if server_availability == ServerAvailability.Down:
-            idle = True
+            new_idle = True
             new_game_name = 'servers DOWN'
         else:
             new_game_name = 'servers UP'
-            new_idle = False
 
     if old_game_name != new_game_name or old_idle != new_idle:
         print('updated game name from [%s] to [%s] and idle from [%s] to [%s]' % (old_game_name, new_game_name, old_idle, new_idle))
