@@ -60,9 +60,10 @@ async def _process_new_status(client, server_status):
         print('updated game name from [%s] to [%s] and idle from [%s] to [%s]' % (old_game_name, new_game_name, old_idle, new_idle))
         await client.change_status(game=discord.Game(name=new_game_name), idle=new_idle)
 
+    print(update_template % server_status.text)
     # send message to all registered channels
     for c in db.get_update_channels():
-        await client.send_message(discord.Channel(id=c.channel_id), update_template % server_status.text)
+        await client.send_message(discord.Object(id=c.channel_id), update_template % server_status.text)
 
 
 async def _do_refresh(client):
