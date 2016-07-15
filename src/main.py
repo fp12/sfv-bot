@@ -13,7 +13,7 @@ client = discord.Client()
 @client.event
 async def on_ready():
     print('on_ready')
-    client.loop.create_task(refresh_twitter_updates(client, 10 * 60 * 60))  # every 10 min
+    client.loop.create_task(refresh_twitter_updates(client, 10 * 60))  # every 10 min
 
 
 client.run(app_config['discord_token'])
