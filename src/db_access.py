@@ -1,5 +1,6 @@
 from config import app_config
 from db_models import DBPersistence, DBUpdateChannel
+import log
 
 
 class DBAccess():
@@ -18,26 +19,42 @@ class DBAccess():
         self._c.close()
         self._conn.close()
 
-    def _log_exc(self, funcname, e):
-        print('DBAccess Exception in {0}: {1}'.format(funcname, e))
-
     # Twitter
 
     def set_last_tweet(self, tweet_id):
         try:
             self._c.execute('UPDATE persistence SET value=%s WHERE key=%s;', (tweet_id, 'last_tweet'))
             self._conn.commit()
-        except Exception as e:
-            self._log_exc('set_last_tweet', e)
+        except:
+            logging.exception('set_last_tweet')
 
     def get_last_tweet(self):
         self._c.execute('SELECT * FROM persistence WHERE key=%s;', ('last_tweet',))
+        return DBPersistence(self._c.fetchone())
+
+    def set_last_idle(self, idle):
+        idle_txt = 'True' if idle else 'False'
+        try:
+            self._c.execute('UPDATE persistence SET value=%s WHERE key=%s;', (idle_txt, 'last_idle'))
+            self._conn.commit()
+        except:
+            logging.exception('set_last_idle')
+
+    def get_last_idle(self):
+        self._c.execute('SELECT * FROM persistence WHERE key=%s;', ('last_idle',))
         return DBPersistence(self._c.fetchone())
 
     def get_update_channels(self):
         self._c.execute('SELECT * FROM update_channels')
         for x in self._c.fetchall():
             yield DBUpdateChannel(x)
+
+    def set_last_message(self, channel_id, message_id):
+        try:
+            self._c.execute('UPDATE update_channels SET last_message=%s WHERE channel_id=%s;', (message_id, channel_id))
+            self._conn.commit()
+        except:
+            logging.exception('set_last_message')
 
 
 db = DBAccess()
