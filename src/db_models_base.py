@@ -1,5 +1,6 @@
 metaattr = 'metaattr'
 
+
 class DBModel(type):
     def __new__(cls, name, bases, namespace, **kargs):
         # don't propagate kargs but add them to namespace

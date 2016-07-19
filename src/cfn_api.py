@@ -7,6 +7,9 @@ from cfn_const import *
 from cfn_models import PlayerSearch
 
 
+logger = logging.getLogger('CFN API')
+
+
 class URL_Binder():
     __Base = 'https://api.prod.capcomfighters.net'
     License = __Base + '/bentov2/sf5/myinfo/%s/fighterlicense/%s'
@@ -24,10 +27,10 @@ class URL_Binder():
 
 
 class CFN_API():
-    __AUTH_HEADERS = { 'User-Agent': 'game=KiwiGame, engine=UE4, version=0' }
-    __HEADERS = { 'User-Agent': 'game=KiwiGame, engine=UE4, version=0', 'Host': 'api.prod.capcomfighters.net', 'Connection': 'Keep-Alive', 'Cache-Control': 'no-cache' }
+    __AUTH_HEADERS = {'User-Agent': 'game=KiwiGame, engine=UE4, version=0'}
+    __HEADERS = {'User-Agent': 'game=KiwiGame, engine=UE4, version=0', 'Host': 'api.prod.capcomfighters.net', 'Connection': 'Keep-Alive', 'Cache-Control': 'no-cache'}
 
-    def __init__(self, loop=None): 
+    def __init__(self, loop=None):
         self._loop = loop or asyncio.get_event_loop()
         self._session = None
         self._urls = None
@@ -41,35 +44,35 @@ class CFN_API():
         if not cookie:
             auth_cookie = app_config['auth_cookie']
             if auth_cookie:
-                headers = self.__AUTH_HEADERS.update({'Cookie' : auth_cookie})
-                logging.info('No request cookie: auth login with [%s]', auth_cookie)
+                headers = self.__AUTH_HEADERS.update({'Cookie': auth_cookie})
+                logger.info('No request cookie: auth login with [%s]', auth_cookie)
                 conn = aiohttp.TCPConnector(verify_ssl=False)
-                with aiohttp.ClientSession(connector=conn, loop=self._loop, headers=headers) as auth_session:
-                    data = app_config['auth_data']
-                    logging.info('Requesting Cookie with data: [%s]' % data)
-                    async with auth_session.post(URL_Binder.Login, data=data) as resp:
-                        if resp.status != 200:
-                            logging.error('Couldn\'t post request to CFN API')
-                            return False
-                        elif not resp.cookies:
-                            logging.error('No cookies returned from request: %s', await resp.text())
-                            return False
-                        else:
-                            cookie = resp.cookies
-                            logging.info('Successfully returned request cookie: %s', cookie)
+                # with aiohttp.ClientSession(connector=conn, loop=self._loop, headers=headers) as auth_session:
+                data = app_config['auth_data']
+                logger.info('Requesting Cookie with data: [%s]' % data)
+                async with aiohttp.request(method='CONNECT', url=URL_Binder.Login, headers=headers, data=data, connector=conn, loop=self._loop) as resp:
+                    if resp.status != 200:
+                        logger.error('Couldn\'t post request to CFN API')
+                        return False
+                    elif not resp.cookies:
+                        logger.error('No cookies returned from request: %s', await resp.text())
+                        return False
+                    else:
+                        cookie = resp.cookies
+                        logger.info('Successfully returned request cookie: %s', cookie)
             else:
-                logging.error('No Auth Cookie to login')
+                logger.error('No Auth Cookie to login')
                 return False
 
         if cookie:
-            logging.info('Creating session with cookie: %s', cookie)
-            headers = self.__HEADERS.update({'Cookie' : cookie})
+            logger.info('Creating session with cookie: %s', cookie)
+            headers = self.__HEADERS.update({'Cookie': cookie})
             self._urls = URL_Binder(cookie)
             conn = aiohttp.TCPConnector(verify_ssl=False)
             self._session = aiohttp.ClientSession(connector=conn, loop=self._loop, headers=headers)
             return True
 
-        logging.error('No cookie to make reqests')
+        logger.error('No cookie to make reqests')
         return False
 
     async def _get(self, url):

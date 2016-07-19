@@ -6,6 +6,9 @@ from cfn_api import cfn_api
 from cfn_models import *
 
 
+logger = logging.getLogger('Commands')
+
+
 async def try_execute(client, message):
     if message.content == 'connect':
         logging.info('executing [connect] command')
@@ -22,6 +25,6 @@ async def try_execute(client, message):
             client.send_message(message.channel, 'Found Player %s - %s' % (player.name, player.cfn_id))
         else:
             client.send_message(message.channel, 'Something went wrong, please check logs')
-            
+
     else:
         logging.info('Unknown command [%s]', message.content)

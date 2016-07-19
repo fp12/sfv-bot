@@ -1,8 +1,6 @@
-import json
-
-
 def intersect(a, b):
     return list(set(a) & set(b))
+
 
 def list_in(a, b):
     return len(intersect(a, b)) == len(a)
