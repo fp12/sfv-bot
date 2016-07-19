@@ -6,7 +6,7 @@ from cfn_api import cfn_api
 from cfn_models import *
 
 
-async def try_execute(self, client, message):
+async def try_execute(client, message):
     if message.content == 'connect':
         logging.info('executing connect command')
         connected = await cfn_api.connect()
