@@ -8,4 +8,4 @@ else:
 	logging_level = logging.DEBUG
 
 
-logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging_level)
+logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s', datefmt='%Y/%m/%d %I:%M:%S %p', level=logging_level)
