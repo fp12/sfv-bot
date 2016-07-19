@@ -42,11 +42,11 @@ class CFN_API():
             auth_cookie = app_config['auth_cookie']
             if auth_cookie:
                 headers = self.__AUTH_HEADERS.update({'Cookie' : auth_cookie})
-                logging.info('No request cookie: auth login with %s', auth_cookie)
+                logging.info('No request cookie: auth login with [%s]', auth_cookie)
                 conn = aiohttp.TCPConnector(verify_ssl=False)
                 with aiohttp.ClientSession(connector=conn, loop=self._loop, headers=headers) as auth_session:
                     data = app_config['auth_data']
-                    logging.info('Requesting Cookie with: %s' % data)
+                    logging.info('Requesting Cookie with data: [%s]' % data)
                     async with auth_session.post(URL_Binder.Login, data=data) as resp:
                         if resp.status != 200:
                             logging.error('Couldn\'t post request to CFN API')
@@ -86,17 +86,18 @@ class CFN_API():
             return None
 
     async def find_player_by_name(self, player_name):
-        potential_names = [player_name]
-        if PROBLEM_CHAR in player_name:
-            potential_names.extend(player_name.split(PROBLEM_CHAR))
-        logging.info('find_player_by_name on: %s' % potential_names)
-        for name in potential_names:
-            url = self._urls.Rival % name
-            search = PlayerSearch.create(await self._get(url))
-            if search and len(search.found_players) > 0:
-                for player in search.found_players:
-                    if player.name.lower() == player_name.lower():
-                        return player
+        if self._session and self._urls:
+            potential_names = [player_name]
+            if PROBLEM_CHAR in player_name:
+                potential_names.extend(player_name.split(PROBLEM_CHAR))
+            logging.info('find_player_by_name on: %s' % potential_names)
+            for name in potential_names:
+                url = self._urls.Rival % name
+                search = PlayerSearch.create(await self._get(url))
+                if search and len(search.found_players) > 0:
+                    for player in search.found_players:
+                        if player.name.lower() == player_name.lower():
+                            return player
         return None
 
 
