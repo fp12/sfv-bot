@@ -14,17 +14,17 @@ async def try_execute(client, message):
         logging.info('executing [connect] command')
         connected = await cfn_api.connect()
         if connected:
-            client.send_message(message.channel, 'CFN API CONNECTED!')
+            await client.send_message(message.channel, 'CFN API CONNECTED!')
         else:
-            client.send_message(message.channel, 'Something went wrong, please check logs')
+            await client.send_message(message.channel, 'Something went wrong, please check logs')
 
     elif message.content == 'info':
         logging.info('executing [info] command')
         player = await cfn_api.find_player_by_name('Backdash_Luffy')
         if player:
-            client.send_message(message.channel, 'Found Player %s - %s' % (player.name, player.cfn_id))
+            await client.send_message(message.channel, 'Found Player %s - %s' % (player.name, player.cfn_id))
         else:
-            client.send_message(message.channel, 'Something went wrong, please check logs')
+            await client.send_message(message.channel, 'Something went wrong, please check logs')
 
     else:
         logging.info('Unknown command [%s]', message.content)

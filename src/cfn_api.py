@@ -52,7 +52,7 @@ class CFN_API():
                     logger.info('Requesting Cookie with data: [%s]' % data)
                     async with auth_session.request(method='CONNECT', url=URL_Binder.Login, data=data) as resp:
                         if resp.status != 200:
-                            logger.error('Couldn\'t post request to CFN API')
+                            logger.error('Couldn\'t post request to CFN API: %s', await resp.text())
                             return False
                         elif not resp.cookies:
                             logger.error('No cookies returned from request: %s', await resp.text())
