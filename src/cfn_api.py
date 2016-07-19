@@ -44,7 +44,7 @@ class CFN_API():
                 headers = self.__AUTH_HEADERS.update({'Cookie' : auth_cookie})
                 logging.info('No request cookie: auth login with %s', auth_cookie)
                 conn = aiohttp.TCPConnector(verify_ssl=False)
-                with aiohttp.ClientSession(connector=conn, loop=self._loop, headers=self._auth) as auth_session:
+                with aiohttp.ClientSession(connector=conn, loop=self._loop, headers=headers) as auth_session:
                     data = app_config['auth_data']
                     logging.info('Requesting Cookie with: %s' % data)
                     async with auth_session.post(URL_Binder.Login, data=data) as resp:
