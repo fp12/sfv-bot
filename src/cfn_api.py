@@ -50,7 +50,7 @@ class CFN_API():
                 with aiohttp.ClientSession(connector=conn, loop=self._loop, headers=headers) as auth_session:
                     data = app_config['auth_data']
                     logger.info('Requesting Cookie with data: [%s]' % data)
-                    async with auth_session.request(method='CONNECT', url=URL_Binder.Login, data=data) as resp:
+                    async with auth_session.request(method='POST', url=URL_Binder.Login, data=data) as resp:
                         if resp.status != 200:
                             logger.error('Couldn\'t post request to CFN API: %s', await resp.text())
                             return False
