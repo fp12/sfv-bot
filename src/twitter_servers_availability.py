@@ -4,6 +4,12 @@ from twitter_update import api  # , get_server_availability
 
 if __name__ == "__main__":
     server_statuses = api.GetHomeTimeline(exclude_replies=True, since_id=753756834154938368)
+    for s in server_statuses:
+    	print(s)
+    server_statuses.sort(key=lambda status: status.id)
+    print('Sorted')
+    for s in server_statuses:
+    	print(s)
     print('%s _do_refresh with %s new status' % (datetime.now().strftime("[%Y/%m/%d] [%I:%M%p]"), len(server_statuses)))
 
     """

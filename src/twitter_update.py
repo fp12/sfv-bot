@@ -48,6 +48,7 @@ def get_server_availability(text):
 
 
 async def _process_new_status(client, server_status):
+    logger.info('Processing tweet #%s [%s]', server_status.id, server_status.text)
     db.set_last_tweet(server_status.id)
     server_availability = get_server_availability(server_status.text)
 
@@ -104,6 +105,7 @@ async def _process_new_status(client, server_status):
 async def _do_refresh(client):
     last_id = db.get_last_tweet().value
     server_statuses = api.GetHomeTimeline(exclude_replies=True, since_id=last_id)
+    server_statuses.sort(key=lambda status: status.id)
     logger.info('%s _do_refresh with %s new status' % (datetime.now().strftime("[%Y/%m/%d] [%I:%M%p]"), len(server_statuses)))
     for s in server_statuses:
         await _process_new_status(client, s)
