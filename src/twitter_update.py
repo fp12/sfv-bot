@@ -83,18 +83,19 @@ async def _process_new_status(client, server_status):
             # send message
             new_msg = await client.send_message(channel, update_template % server_status.text)
 
-            # unpin last message
-            try:
-                old_msg = await client.get_message(channel, c.last_message)
-                await client.unpin_message(old_msg)
-            except Exception as e:
-                logger.exception('Exception while trying to unpin message on server %s: %s' % (c.server_id, e))
+            if server_availability != ServerAvailability.Unknown:
+                # unpin last message
+                try:
+                    old_msg = await client.get_message(channel, c.last_message)
+                    await client.unpin_message(old_msg)
+                except Exception as e:
+                    logger.exception('Exception while trying to unpin message on server %s: %s' % (c.server_id, e))
 
-            # pin new message
-            try:
-                await client.pin_message(new_msg)
-            except Exception as e:
-                logger.exception('Exception while trying to pin message on server %s: %s' % (c.server_id, e))
+                # pin new message
+                try:
+                    await client.pin_message(new_msg)
+                except Exception as e:
+                    logger.exception('Exception while trying to pin message on server %s: %s' % (c.server_id, e))
 
             # store last message
             db.set_last_message(c.channel_id, new_msg.id)
