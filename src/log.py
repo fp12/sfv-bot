@@ -9,3 +9,4 @@ else:
 
 
 logging.basicConfig(format='[%(levelname)s] [%(name)s] %(message)s', level=logging_level)
+logging.getLogger('requests.packages.urllib3.connectionpool').addHandler(logging.NullHandler())
