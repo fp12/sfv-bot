@@ -9,4 +9,9 @@ else:
 
 
 logging.basicConfig(format='[%(levelname)s] [%(name)s] %(message)s', level=logging_level)
-logging.getLogger('requests.packages.urllib3.connectionpool').addHandler(logging.NullHandler())
+
+log_main = logging.getLogger('Main')
+log_twitter = logging.getLogger('Twitter')
+log_db = logging.getLogger('DB')
+log_commands = logging.getLogger('Commands')
+log_cfn = logging.getLogger('CFN')

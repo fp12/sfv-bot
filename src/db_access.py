@@ -1,10 +1,6 @@
 from config import app_config
 from db_models import DBPersistence, DBUpdateChannel
-import logging
-import log
-
-
-logger = logging.getLogger('DB')
+from log import log_db
 
 
 class DBAccess():
@@ -30,7 +26,7 @@ class DBAccess():
             self._c.execute('UPDATE persistence SET value=%s WHERE key=%s;', (tweet_id, 'last_tweet'))
             self._conn.commit()
         except:
-            logger.exception('set_last_tweet')
+            log_db.exception('set_last_tweet')
 
     def get_last_tweet(self):
         self._c.execute('SELECT * FROM persistence WHERE key=%s;', ('last_tweet',))
@@ -42,7 +38,7 @@ class DBAccess():
             self._c.execute('UPDATE persistence SET value=%s WHERE key=%s;', (idle_txt, 'last_idle'))
             self._conn.commit()
         except:
-            logger.exception('set_last_idle')
+            log_db.exception('set_last_idle')
 
     def get_last_idle(self):
         self._c.execute('SELECT * FROM persistence WHERE key=%s;', ('last_idle',))
@@ -58,7 +54,7 @@ class DBAccess():
             self._c.execute('UPDATE update_channels SET last_message=%s WHERE channel_id=%s;', (message_id, channel_id))
             self._conn.commit()
         except:
-            logger.exception('set_last_message')
+            log_db.exception('set_last_message')
 
 
 db = DBAccess()

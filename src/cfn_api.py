@@ -1,13 +1,9 @@
 import asyncio
 import aiohttp
 from config import app_config
-import logging
-import log
+from log import log_cfn
 from cfn_const import *
 from cfn_models import PlayerSearch
-
-
-logger = logging.getLogger('CFN API')
 
 
 class URL_Binder():
@@ -45,34 +41,34 @@ class CFN_API():
             auth_cookie = app_config['auth_cookie']
             if auth_cookie:
                 headers = self.__AUTH_HEADERS.update({'Cookie': auth_cookie})
-                logger.info('No request cookie: auth login with [%s]', auth_cookie)
+                log_cfn.info('No request cookie: auth login with [%s]', auth_cookie)
                 conn = aiohttp.TCPConnector(verify_ssl=False)
                 with aiohttp.ClientSession(connector=conn, loop=self._loop, headers=headers) as auth_session:
                     data = app_config['auth_data']
-                    logger.info('Requesting Cookie with data: [%s]' % data)
+                    log_cfn.info('Requesting Cookie with data: [%s]' % data)
                     async with auth_session.request(method='POST', url=URL_Binder.Login, data=data) as resp:
                         if resp.status != 200:
-                            logger.error('Couldn\'t post request to CFN API: %s', await resp.text())
+                            log_cfn.error('Couldn\'t post request to CFN API: %s', await resp.text())
                             return False
                         elif not resp.cookies:
-                            logger.error('No cookies returned from request: %s', await resp.text())
+                            log_cfn.error('No cookies returned from request: %s', await resp.text())
                             return False
                         else:
                             cookie = resp.cookies
-                            logger.info('Successfully returned request cookie: %s', cookie)
+                            log_cfn.info('Successfully returned request cookie: %s', cookie)
             else:
-                logger.error('No Auth Cookie to login')
+                log_cfn.error('No Auth Cookie to login')
                 return False
 
         if cookie:
-            logger.info('Creating session with cookie: %s', cookie)
+            log_cfn.info('Creating session with cookie: %s', cookie)
             headers = self.__HEADERS.update({'Cookie': cookie})
             self._urls = URL_Binder(cookie)
             conn = aiohttp.TCPConnector(verify_ssl=False)
             self._session = aiohttp.ClientSession(connector=conn, loop=self._loop, headers=headers)
             return True
 
-        logger.error('No cookie to make reqests')
+        log_cfn.error('No cookie to make reqests')
         return False
 
     async def _get(self, url):
@@ -80,7 +76,7 @@ class CFN_API():
             async with self._session.get(url) as resp:
                 result = await resp.text()
                 if 'Session Expired' in result:
-                    logging.info('Session expired')
+                    log_cfn.info('Session expired')
                     self._session.close()
                     self._session = None
                     return None
@@ -93,7 +89,7 @@ class CFN_API():
             potential_names = [player_name]
             if PROBLEM_CHAR in player_name:
                 potential_names.extend(player_name.split(PROBLEM_CHAR))
-            logging.info('find_player_by_name on: %s' % potential_names)
+            log_cfn.info('find_player_by_name on: %s' % potential_names)
             for name in potential_names:
                 url = self._urls.Rival % name
                 search = PlayerSearch.create(await self._get(url))

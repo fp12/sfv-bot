@@ -6,11 +6,7 @@ import twitter
 import discord
 from config import app_config
 from db_access import db
-import logging
-import log
-
-
-logger = logging.getLogger('Twitter')
+from log import log_twitter
 
 
 class ServerAvailability(Enum):
@@ -48,7 +44,7 @@ def get_server_availability(text):
 
 
 async def _process_new_status(client, server_status):
-    logger.info('Processing tweet #%s [%s]', server_status.id, server_status.text)
+    log_twitter.info('Processing tweet #%s [%s]', server_status.id, server_status.text)
     db.set_last_tweet(server_status.id)
     server_availability = get_server_availability(server_status.text)
 
@@ -74,7 +70,7 @@ async def _process_new_status(client, server_status):
     if old_game_name != new_game_name or old_idle != new_idle:
         db.set_last_idle(new_idle)
         await client.change_status(game=discord.Game(name=new_game_name), idle=new_idle)
-        logger.info('Updated game name from [%s] to [%s] and idle from [%s] to [%s]' % (old_game_name, new_game_name, old_idle, new_idle))
+        log_twitter.info('Updated game name from [%s] to [%s] and idle from [%s] to [%s]' % (old_game_name, new_game_name, old_idle, new_idle))
 
     # send message to all registered channels
     for c in db.get_update_channels():
@@ -89,25 +85,25 @@ async def _process_new_status(client, server_status):
                     old_msg = await client.get_message(channel, c.last_message)
                     await client.unpin_message(old_msg)
                 except Exception as e:
-                    logger.exception('Exception while trying to unpin message on server %s: %s' % (c.server_id, e))
+                    log_twitter.exception('Exception while trying to unpin message on server %s: %s' % (c.server_id, e))
 
                 # pin new message
                 try:
                     await client.pin_message(new_msg)
                 except Exception as e:
-                    logger.exception('Exception while trying to pin message on server %s: %s' % (c.server_id, e))
+                    log_twitter.exception('Exception while trying to pin message on server %s: %s' % (c.server_id, e))
 
             # store last message
             db.set_last_message(c.channel_id, new_msg.id)
         else:
-            logger.error('Channel not set for server %s' % c.server_id)
+            log_twitter.error('Channel not set for server %s' % c.server_id)
 
 
 async def _do_refresh(client):
     last_id = db.get_last_tweet().value
     server_statuses = api.GetHomeTimeline(exclude_replies=True, since_id=last_id)
     server_statuses.sort(key=lambda status: status.id)
-    logger.info('%s _do_refresh with %s new status' % (datetime.now().strftime("[%Y/%m/%d] [%I:%M%p]"), len(server_statuses)))
+    log_twitter.info('%s _do_refresh with %s new status' % (datetime.now().strftime("[%Y/%m/%d] [%I:%M%p]"), len(server_statuses)))
     for s in server_statuses:
         await _process_new_status(client, s)
 
@@ -120,7 +116,7 @@ async def refresh_twitter_updates(client, interval):
     else:
         new_game_name = servers_up_txt
     await client.change_status(game=discord.Game(name=new_game_name), idle=was_idle)
-    logger.info('(from last session) Updated game name to [%s] and idle to [%s]' % (new_game_name, was_idle))
+    log_twitter.info('(from last session) Updated game name to [%s] and idle to [%s]' % (new_game_name, was_idle))
 
     # main loop
     while True:

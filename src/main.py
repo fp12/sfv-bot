@@ -2,15 +2,11 @@ import asyncio
 import discord
 from config import app_config
 from twitter_update import refresh_twitter_updates
-import logging
-import log
+from log import log_main
 from commands import try_execute
 
 
-logger = logging.getLogger('Main')
-
-
-logger.info('app_start')
+log_main.info('app_start')
 
 
 client = discord.Client()
@@ -18,18 +14,18 @@ client = discord.Client()
 
 @client.event
 async def on_ready():
-    logger.info('on_ready')
+    log_main.info('on_ready')
     client.loop.create_task(refresh_twitter_updates(client, 2 * 60))  # every 2 min
 
 
 @client.event
 async def on_server_join(server):
-    logger.info('on_server_join \'%s\' (%s) owned by \'%s\'' % (server.name, server.id, server.owner.name))
+    log_main.info('on_server_join \'%s\' (%s) owned by \'%s\'' % (server.name, server.id, server.owner.name))
 
 
 @client.event
 async def on_server_remove(server):
-    logger.info('on_server_remove \'%s\' (%s) owned by \'%s\'' % (server.name, server.id, server.owner.name))
+    log_main.info('on_server_remove \'%s\' (%s) owned by \'%s\'' % (server.name, server.id, server.owner.name))
 
 
 @client.event
