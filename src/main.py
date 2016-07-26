@@ -16,7 +16,7 @@ client = discord.Client()
 @client.event
 async def on_ready():
     logging.info('on_ready')
-    client.loop.create_task(refresh_twitter_updates(client, 10 * 60))  # every 10 min
+    client.loop.create_task(refresh_twitter_updates(client, 2 * 60))  # every 2 min
 
 
 @client.event
