@@ -1,8 +1,5 @@
-import asyncio
-import discord
 from log import log_commands
 from cfn_api import cfn_api
-from cfn_models import *
 
 
 async def try_execute(client, message):

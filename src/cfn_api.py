@@ -2,7 +2,7 @@ import asyncio
 import aiohttp
 from config import app_config
 from log import log_cfn
-from cfn_const import *
+from cfn_const import PROBLEM_CHAR
 from cfn_models import PlayerSearch
 
 

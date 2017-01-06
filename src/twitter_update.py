@@ -1,7 +1,6 @@
 import asyncio
 import re
 from enum import Enum
-from datetime import datetime
 import twitter
 import discord
 from config import app_config

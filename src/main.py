@@ -1,4 +1,3 @@
-import asyncio
 import discord
 from config import app_config
 from twitter_update import refresh_twitter_updates
