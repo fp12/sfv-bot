@@ -29,5 +29,8 @@ async def try_execute(client, message):
         embed.set_footer(text="[footer text](https://twitter.com/SFVServer/status/847962241114660864)")
         await client.send_message(message.channel, embed=embed)
 
+    elif message.content == 'stats':
+        await client.send_message(message.channel, f'{len(client.servers)} servers')
+
     else:
         log_commands.info('Unknown command [%s]', message.content)
