@@ -51,7 +51,7 @@ async def try_execute(client, message):
 
     elif message.content == 'test':
         last_id = db.get_last_tweet().value
-        server_status = api.GetHomeTimeline(exclude_replies=True, since_id=last_id)[0]
+        server_status = api.GetHomeTimeline(exclude_replies=True, since_id=last_id-1)[0]
         col = discord.Colour(0x5961870) if new_status == discord.Status.online else discord.Colour.dark_magenta()
         embed = discord.Embed(colour=col, title=f'[New update](https://twitter.com/{server_status.user.screen_name}/status/{server_status.id})', description=server_status.text)
         embed.set_author(name=server_status.user.name, url=server_status.user.url, icon_url=server_status.user.profile_image_url)
