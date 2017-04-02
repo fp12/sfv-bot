@@ -3,7 +3,24 @@ from log import log_commands
 from cfn_api import cfn_api
 
 
-log_commands.info(discord.__version__)
+def paginate(dump, max_per_page=2000):
+    paginated = []
+    if len(dump) < max_per_page:
+        paginated.append(dump)
+    else:
+        page_index = 0
+        len_count = 0
+        split = dump.splitlines(True)
+        for i, line in enumerate(split):
+            if i == len(split) - 1:
+                paginated.append(dump[page_index:])
+            elif len_count + len(line) >= max_per_page:
+                paginated.append(dump[page_index:page_index + len_count])
+                page_index += len_count
+                len_count = len(line)
+            else:
+                len_count += len(line)
+    return paginated
 
 
 async def try_execute(client, message):
@@ -33,8 +50,10 @@ async def try_execute(client, message):
         names = []
         for s in client.servers:
             names.append(f'**{s.name}** - *{s.owner.name}*')
-        embed = discord.Embed(colour=0x0000ff, title=f'{len(client.servers)} servers', description='\n'.join(names))
+        embed = discord.Embed(colour=0x0000ff, title=f'{len(client.servers)} servers')
         await client.send_message(message.channel, embed=embed)
+        for page in paginate('\n'.join(names)):
+            await client.send_message(message.channel, page)
 
     else:
         log_commands.info('Unknown command [%s]', message.content)

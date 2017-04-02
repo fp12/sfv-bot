@@ -6,6 +6,7 @@ from commands import try_execute
 
 
 log_main.info('app_start')
+log_main.info(discord.__version__)
 
 
 client = discord.Client()
