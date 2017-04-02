@@ -52,24 +52,24 @@ async def _process_new_status(client, server_status):
         old_game_name = s.me.game.name if s.me.game else ''
         break
 
-    new_idle = old_idle = bot_status == discord.Status.idle
-    if old_idle:
+    new_status = bot_status
+    if bot_status == discord.Status.do_not_disturb:
         if server_availability == ServerAvailability.Up:
-            new_idle = False
+            new_status = discord.Status.online
             new_game_name = servers_up_txt
         else:
             new_game_name = servers_down_txt
     else:
         if server_availability == ServerAvailability.Down:
-            new_idle = True
+            new_status = discord.Status.do_not_disturb
             new_game_name = servers_down_txt
         else:
             new_game_name = servers_up_txt
 
-    if old_game_name != new_game_name or old_idle != new_idle:
-        db.set_last_idle(new_idle)
-        await client.change_status(game=discord.Game(name=new_game_name), idle=new_idle)
-        log_twitter.info('Updated game name from [%s] to [%s] and idle from [%s] to [%s]' % (old_game_name, new_game_name, old_idle, new_idle))
+    if old_game_name != new_game_name or bot_status != new_status:
+        db.set_last_idle(new_status == discord.Status.do_not_disturb)
+        await client.change_presence(game=discord.Game(name=new_game_name), status=new_status)
+        log_twitter.info('Updated game name from [%s] to [%s] and status from [%s] to [%s]' % (old_game_name, new_game_name, bot_status, new_status))
 
     # send message to all registered channels
     for c in db.get_update_channels():
@@ -112,10 +112,12 @@ async def refresh_twitter_updates(client, interval):
     was_idle = db.get_last_idle().value == 'True'
     if was_idle:
         new_game_name = servers_down_txt
+        new_status = discord.Status.do_not_disturb
     else:
         new_game_name = servers_up_txt
-    await client.change_status(game=discord.Game(name=new_game_name), idle=was_idle)
-    log_twitter.info('(from last session) Updated game name to [%s] and idle to [%s]' % (new_game_name, was_idle))
+        new_status = discord.Status.online
+    await client.change_presence(game=discord.Game(name=new_game_name), status=new_status)
+    log_twitter.info('(from last session) Updated game name to [%s] and status to [%s]' % (new_game_name, new_status))
 
     # main loop
     while True:
