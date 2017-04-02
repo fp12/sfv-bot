@@ -1,6 +1,9 @@
+import discord
 from log import log_commands
 from cfn_api import cfn_api
-import discord.embeds
+
+
+log_commands.info(discord.__version__)
 
 
 async def try_execute(client, message):
