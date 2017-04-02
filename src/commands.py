@@ -30,7 +30,10 @@ async def try_execute(client, message):
         await client.send_message(message.channel, embed=embed)
 
     elif message.content == 'stats':
-        await client.send_message(message.channel, f'{len(client.servers)} servers')
+        embed = discord.Embed(colour=0x0000ff, title=f'{len(client.servers)} servers')
+        for s in client.servers:
+            embed.add_field(name=s.name, value=s.owner.name)
+        await client.send_message(message.channel, embed=embed)
 
     else:
         log_commands.info('Unknown command [%s]', message.content)
