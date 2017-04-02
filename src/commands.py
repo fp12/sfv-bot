@@ -1,5 +1,6 @@
 from log import log_commands
 from cfn_api import cfn_api
+import discord
 
 
 async def try_execute(client, message):
@@ -18,6 +19,12 @@ async def try_execute(client, message):
             await client.send_message(message.channel, 'Found Player %s - %s' % (player.name, player.cfn_id))
         else:
             await client.send_message(message.channel, 'Something went wrong, please check logs')
+
+    elif message.content == 'test':
+        embed = discord.Embed(colour=discord.Colour(0xc43f05), description="More PC Beta test servers are open to play.  Thank you for participating in this beta test.")
+        embed.set_author(name="SFVServer", url="https://twitter.com/SFVServer", icon_url="https://pbs.twimg.com/profile_images/664136923309436928/AyadcsH1.png")
+        embed.set_footer(text="[footer text](https://twitter.com/SFVServer/status/847962241114660864)")
+        await client.send_message(message.channel, embed=embed)
 
     else:
         log_commands.info('Unknown command [%s]', message.content)
