@@ -30,9 +30,10 @@ async def try_execute(client, message):
         await client.send_message(message.channel, embed=embed)
 
     elif message.content == 'stats':
-        embed = discord.Embed(colour=0x0000ff, title=f'{len(client.servers)} servers')
+        names = []
         for s in client.servers:
-            embed.add_field(name=s.name, value=s.owner.name)
+            names.append(f'{s.name - s.owner.name}')
+        embed = discord.Embed(colour=0x0000ff, title=f'{len(client.servers)} servers', description='\n'.join(names))
         await client.send_message(message.channel, embed=embed)
 
     else:
