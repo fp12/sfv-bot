@@ -54,8 +54,8 @@ async def try_execute(client, message):
         server_status = api.GetHomeTimeline(exclude_replies=True, since_id=int(last_id)-1)[0]
         col = discord.Colour(0x5961870) if True else discord.Colour.dark_magenta()
         embed = discord.Embed(colour=col, title=f'[New update](https://twitter.com/{server_status.user.screen_name}/status/{server_status.id})', description=server_status.text)
-        embed.set_author(name=server_status.user.name, url=server_status.user.url, icon_url=server_status.user.profile_image_url)
-        log_commands.info(embed.title, embed.description, embed.colour, embed.author)
+        # embed.set_author(name=server_status.user.name, url=server_status.user.url, icon_url=server_status.user.profile_image_url)
+        # log_commands.info(embed.title, embed.description, embed.colour, embed.author)
         await client.send_message(message.channel, embed=embed)
 
     elif message.content == 'stats':
