@@ -24,11 +24,6 @@ r_up = re.compile(r""".*servers.+are\s(.*\s)?(open|up)[,!\.\s].*""", re.IGNORECA
 r_down = re.compile(r""".*servers.+are\s(.*\s)?(down|offline)[,!\.\s].*""", re.IGNORECASE)
 
 
-update_template = """```ruby
-Update From SFVServer (Twitter):
-# %s
-```"""
-
 servers_up_txt = 'servers UP'
 servers_down_txt = 'servers DOWN'
 
@@ -36,10 +31,17 @@ servers_down_txt = 'servers DOWN'
 def get_server_availability(text):
     if r_up.match(text):
         return ServerAvailability.Up
-    elif r_down.match(text):
+    if r_down.match(text):
         return ServerAvailability.Down
-    else:
-        return ServerAvailability.Unknown
+    return ServerAvailability.Unknown
+
+
+def get_colour_for_availability(avail):
+    if avail == ServerAvailability.Up:
+        return discord.Colour.green()
+    if avail == ServerAvailability.Down:
+        return discord.Colour.dark_magenta()
+    return discord.Colour.blue()
 
 
 async def _process_new_status(client, server_status):
@@ -76,7 +78,12 @@ async def _process_new_status(client, server_status):
         channel = client.get_channel(c.channel_id)
         if channel:
             # send message
-            new_msg = await client.send_message(channel, update_template % server_status.text)
+            embed = discord.Embed(colour=get_colour_for_availability(server_availability),
+                                  title='New update:',
+                                  url=f'https://twitter.com/{server_status.user.screen_name}/status/{server_status.id}',
+                                  description=server_status.text)
+            embed.set_author(name=server_status.user.name, url=server_status.user.url, icon_url=server_status.user.profile_image_url)
+            new_msg = await client.send_message(channel, embed=embed)
 
             if server_availability != ServerAvailability.Unknown:
                 # unpin last message
