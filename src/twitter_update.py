@@ -40,8 +40,8 @@ def get_colour_for_availability(avail):
     if avail == ServerAvailability.Up:
         return discord.Colour.green()
     if avail == ServerAvailability.Down:
-        return discord.Colour.dark_magenta()
-    return discord.Colour.blue()
+        return discord.Colour.red()
+    return discord.Colour.dark_blue()
 
 
 async def _process_new_status(client, server_status):
