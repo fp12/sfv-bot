@@ -29,6 +29,8 @@ servers_down_txt = 'servers DOWN'
 
 
 def get_server_availability(text):
+    if 'beta' in text:
+        return ServerAvailability.Unknown
     if r_up.match(text):
         return ServerAvailability.Up
     if r_down.match(text):
@@ -83,24 +85,10 @@ async def _process_new_status(client, server_status):
                                   url=f'https://twitter.com/{server_status.user.screen_name}/status/{server_status.id}',
                                   description=server_status.text)
             embed.set_author(name=server_status.user.name, url=server_status.user.url, icon_url=server_status.user.profile_image_url)
-            new_msg = await client.send_message(channel, embed=embed)
-
-            if server_availability != ServerAvailability.Unknown:
-                # unpin last message
-                try:
-                    old_msg = await client.get_message(channel, c.last_message)
-                    await client.unpin_message(old_msg)
-                except Exception as e:
-                    log_twitter.exception('Exception while trying to unpin message on server %s: %s' % (c.server_id, e))
-
-                # pin new message
-                try:
-                    await client.pin_message(new_msg)
-                except Exception as e:
-                    log_twitter.exception('Exception while trying to pin message on server %s: %s' % (c.server_id, e))
-
-            # store last message
-            db.set_last_message(c.channel_id, new_msg.id)
+            try:
+                new_msg = await client.send_message(channel, embed=embed)
+            except Exception as e:
+                log_twitter.exception(f'Exception while trying to send message on server {channel.server.name}: {e}')
         else:
             log_twitter.error('Channel not set for server %s' % c.server_id)
 
