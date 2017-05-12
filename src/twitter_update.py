@@ -29,7 +29,7 @@ servers_down_txt = 'servers DOWN'
 
 
 def get_server_availability(text):
-    if 'beta' in text:
+    if 'beta' in text or 'Beta' in text:
         return ServerAvailability.Unknown
     if r_up.match(text):
         return ServerAvailability.Up
