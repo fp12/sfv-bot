@@ -86,7 +86,7 @@ async def _process_new_status(client, server_status):
                                   description=server_status.text)
             embed.set_author(name=server_status.user.name, url=server_status.user.url, icon_url=server_status.user.profile_image_url)
             try:
-                new_msg = await client.send_message(channel, embed=embed)
+                await client.send_message(channel, embed=embed)
             except Exception as e:
                 log_twitter.exception(f'Exception while trying to send message on server {channel.server.name}: {e}')
         else:
@@ -95,11 +95,15 @@ async def _process_new_status(client, server_status):
 
 async def _do_refresh(client):
     last_id = db.get_last_tweet().value
-    server_statuses = api.GetHomeTimeline(exclude_replies=True, since_id=last_id)
-    server_statuses.sort(key=lambda status: status.id)
-    log_twitter.info('_do_refresh with %s new status' % len(server_statuses))
-    for s in server_statuses:
-        await _process_new_status(client, s)
+    try:
+        server_statuses = api.GetHomeTimeline(exclude_replies=True, since_id=last_id)
+    except Exception as e:
+        log_twitter.exception(f'Exception while trying to get twitter timeline: {e}')
+    else:
+        server_statuses.sort(key=lambda status: status.id)
+        log_twitter.info('_do_refresh with %s new status' % len(server_statuses))
+        for s in server_statuses:
+            await _process_new_status(client, s)
 
 
 async def refresh_twitter_updates(client, interval):
